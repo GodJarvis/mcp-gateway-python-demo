@@ -1,0 +1,29 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite:////app/data/gateway.db
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-dev-admin-key}
+      MCP_API_KEY: ${MCP_API_KEY:-dev-mcp-key}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-replace-before-production}
+      FRONTEND_ORIGINS: http://localhost:5173
+      MCP_ALLOWED_HOSTS: localhost:*,127.0.0.1:*
+      MCP_ALLOWED_ORIGINS: http://localhost:5173
+      ALLOW_PRIVATE_TARGETS: "true"
+    volumes:
+      - gateway_data:/app/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+volumes:
+  gateway_data:
+
